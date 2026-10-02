@@ -17,6 +17,10 @@ typecheck` and `npm run build` both pass.
 were re-run that day; `tests/strip-only.test.ts` now catches that class of break on
 every commit. If you check out a commit from that window, neither script will start.
 
+`main` was rewritten on 2026-10-01. File contents are unchanged at every commit, but every
+hash from the build onward is new. A copy taken before 13:37 on 2026-09-12 updates with
+`git pull`; a copy taken after that should be downloaded fresh instead.
+
 Run the four commands under "The exact commands to run first" at the end of this file.
 Then read "What the eval suite measured" and "Risks worth a decision", which are the
 parts that need you rather than another agent.
@@ -59,29 +63,7 @@ It lists the decisions that were asked and not yet answered when the last sessio
 Asked of the owner, or found, in the session that ended on 2026-10-01, and not yet
 settled. Nothing here is broken; each is a decision.
 
-**1. One commit still shows Claude as an author.** The 34 commits of the v1 build were
-rewritten on 2026-10-01 to remove `Co-Authored-By` and `Claude-Session` trailers, which
-the owner does not want on their commits, and `main` was force-pushed. Four earlier
-commits still carry one. `95153be`, the initial commit, carries `Co-Authored-By: Claude`
-and so keeps Claude in the repository's contributor list; `449ae75`, `3a1cbe9` and
-`4153e1d` carry only `Claude-Session`, which GitHub does not show as an author. Removing
-them means rewriting from the first commit, which changes every hash in the repository.
-Waiting on the owner, and best decided after Session 4 on 2026-10-02, so students are not
-hit twice.
-
-The rewrite already moved every hash from the build onward. A copy of the repository made
-before the build first reached GitHub, at 13:37 on 2026-09-12, updates cleanly with
-`git pull`. A copy made after that meets a diverged history; download a fresh copy instead.
-The latest version also carries the smoke and eval fix, `68a7869`, and the landing rail fix.
-The full old-to-new map is in the brain task
-`tasks/20261002-redline-checkpoint-rewritten-before-session-5`.
-
-**2. A local backup branch exists.** `backup/main-before-trailer-rewrite` points at the
-history as it was before the rewrite. It was never pushed. Delete it with
-`git branch -D backup/main-before-trailer-rewrite` once the rewritten history has been
-checked.
-
-**3. `DESIGN.md` does not yet say a pinned element must be opaque.** The landing page's
+**1. `DESIGN.md` does not yet say a pinned element must be opaque.** The landing page's
 rail had a sticky top group with no background, so the clause list showed through it on
 scroll. Fixed in `app/landing.css`. `DESIGN.md` still describes the sticky group without
 saying it needs the rail's own field, so the next pinned element could repeat the bug.
@@ -89,14 +71,14 @@ saying it needs the rail's own field, so the next pinned element could repeat th
 the bug; it was left alone because this report treats those files as the untouched
 record. One sentence in `DESIGN.md` would close it. Waiting on the owner.
 
-**4. The landing page and the app share rail class names.** `app/landing.css` and
+**2. The landing page and the app share rail class names.** `app/landing.css` and
 `components/rail.css` both style `.rail` and `.rail__top`. Harmless today, because every
 link between the landing page and the app is a plain `<a href>`, so the two stylesheets
 never load into the same document. If anyone switches those links to Next's `<Link>`,
 the landing rail's sticky and spacing rules can leak into the app shell. Rename one set
 before making that change.
 
-**5. The summary told the reader about a clause its flag could not cite.** In the
+**3. The summary told the reader about a clause its flag could not cite.** In the
 2026-10-01 smoke run the liability-cap flag was dropped again because the model retyped
 its characters, and the plain-English summary still said Meridian's liability is capped
 at a year of fees. So the one clause the checked path could not show was described by
