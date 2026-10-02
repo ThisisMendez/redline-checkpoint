@@ -92,33 +92,62 @@ The honest options we did not have time to try, recorded for whoever picks this 
   exactly the kind of sentence that erodes confidence in everything else on the page.
   A real product decision, not a technical one.
 
-## A citation failure quietly cost a severity adjustment
+## A citation failure can silently move a severity band
 
 Worth reading twice, because it is the kind of coupling nobody designs and everybody
 inherits.
 
 Severity is assigned during analysis from the clause instance's own terms, not from a
 lookup on its type (ADR 0003, and ticket 04 built it that way). The one movement rule
-that shipped is: a window the reader can actually use, meaning a period the document
-states, running each time the clause bites, at least thirty days long, moves the band
-one step toward moderate. And the day count has to appear in a sentence the flag cites,
-so that a term which moves severity is itself checked against the document.
+that shipped is: a window the reader can actually use, meaning a period that runs each
+time the clause bites, is at least thirty days long, and is stated in the document,
+moves the band one step toward moderate. "Stated in the document" means the day count
+has to appear in a sentence the flag cites, so that a term which moves severity is
+itself checked against the document.
 
-That last clause is the right design. It is also a dependency.
+That last condition is the right design. It is also a dependency, because the sentences
+a flag cites are its source sentence plus its exit sentence, and **an exit that fails
+verification is not among them** (`src/analysis/flags.ts`, where `cited` is built).
 
-In the real run, the arbitration flag's exit was a thirty-day opt-out. The model
-retyped the non-breaking space in that sentence, so the exit was dropped by the
-verifier. With the exit gone, the digits `30` appeared in no sentence the flag cited.
-The severity logic saw no usable window and left the band where the type put it.
+### The exposed clause is P-07, and it has not failed yet
 
-Nothing malfunctioned. Every piece did what it was designed to do. But a character
-fidelity problem in one sentence propagated into a severity outcome two seams away, and
-no test anywhere asserted the connection because no test knew it existed. We only saw
-it because the smoke script printed enough to notice.
+The second auto-renewal in the fixture contract, the Program enrolment, lands at
+Moderate rather than its baseline High because of a ninety-day notice window. Its source
+sentence carries no digits at all. The `90` exists only in its exit sentence, and that
+exit sentence carries the ligature glyph in "ofﬁce".
 
-**The general lesson: when a verification gate feeds a derived value, a verification
-failure is also a silent input change.** Write that down wherever the gate is, because
-the code reads as two independent correct behaviours.
+So the band depends on the exit surviving verification, and the exit carries exactly the
+kind of character the model retypes. If a run ever retypes that ligature, the exit
+drops, the `90` vanishes from the cited sentences, the window stops counting as stated,
+and the flag moves from Moderate to High. Nothing would report it: the flag still
+verifies, its quote is still honest, only its band changes.
+
+It survived every real run so far. It is a latent coupling, not an observed one.
+
+### Correction: the arbitration case did not do this
+
+An earlier version of this section, and the commit message for ticket 10, said the
+dropped arbitration opt-out had cost that flag a severity adjustment. It had not. The
+arbitration window is a thirty-day opt-out that runs once from signing, and the gate in
+`src/analysis/severity.ts` rejects any window that does not run each time the clause
+bites before it ever asks whether the window is stated. So that band would have stayed
+Critical with the exit or without it. The smoke output on 2026-10-01 shows it directly:
+`30 days, once-at-the-start, stated in the document: false`. The dropped exit changed
+what the reader sees under that flag and changed nothing about its band.
+
+The error came from reading "the exit dropped and the band did not move" as cause and
+effect without checking which gate fired first. Worth keeping as its own small lesson.
+
+### What follows
+
+The coupling fails toward the higher band, which is the direction ADR 0004 chose for
+errors, so it is not dangerous. It is unannounced. No test asserts that P-07's band
+depends on its exit, because no test knew it did.
+
+**The general lesson still holds: when a verification gate feeds a derived value, a
+verification failure is also a silent input change.** Write that down wherever the gate
+is, because the code reads as two independent correct behaviours. And when you think you
+have caught one in the act, check the gate order before you say so.
 
 ## Recall has to be measured two ways, and the gap is the interesting number
 
@@ -452,7 +481,7 @@ The concrete payoff: the character-fidelity finding, the severity coupling it ca
 the reason recall is measured two ways are all in commit messages. Six months from now
 they are recoverable without this file existing.
 
-## Two incidents worth remembering
+## Three incidents worth remembering
 
 **A stray NUL byte made a source file binary to git.** Ticket 04 used a literal NUL as
 the separator in a composite dedup key. Sound choice of value, since a NUL cannot occur
@@ -469,6 +498,25 @@ authentication failure had occurred at all and the rotation was not implicated, 
 only knowable because the instruction asked for the full history rather than the outcome.
 **Ask for every attempt, not the successful one.** An agent optimising for a clean report
 will show you the clean run.
+
+**The acceptance script broke and stayed broken for the rest of the build.** Ticket 03
+added a TypeScript constructor parameter property to the PDF seam. Vitest and Next both
+compile that without complaint, but `npm run smoke` and `npm run eval` load the source
+through Node's built-in type stripping, which refuses any TypeScript syntax that emits
+runtime code. So the suite passed, the build passed, and the owner's acceptance check
+could not start. Nobody noticed until the owner ran smoke on 2026-10-01.
+
+The cause was the verification routine, not the code. Each ticket was checked with the
+typecheck, its own tests, the full suite and a diff read. Smoke was run in the ticket that
+wrote it and never again, and eval the same. **A check that lives outside `npm test`
+decays the moment the ticket that wrote it closes.** The fix was one field declaration;
+the durable fix was `tests/strip-only.test.ts`, which asks Node's own stripper about every
+file the scripts can load, so the class of break now fails the suite on every commit. It
+was proven against the broken file before it was trusted.
+
+The general rule for next time: **after every ticket, run every script a person will run,
+not only the ones that ticket touched.** Or, better, move each such check into the suite,
+which is what the guard does.
 
 ## Marking a criterion as partly met
 

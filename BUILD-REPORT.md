@@ -8,9 +8,14 @@ This file is the handover. Read "Start here when you sit down" first.
 
 ## Start here when you sit down
 
-**All fourteen tickets are done, committed and pushed.** The deterministic suite is 559
+**All fourteen tickets are done, committed and pushed.** The deterministic suite is 606
 tests, passes in under a second, makes no network call and needs no key. `npm run
 typecheck` and `npm run build` both pass.
+
+`npm run smoke` and `npm run eval` were broken from the ticket 03 commit until
+2026-10-01, by TypeScript syntax that plain Node refuses to load. Both are fixed and
+were re-run that day; `tests/strip-only.test.ts` now catches that class of break on
+every commit. If you check out a commit from that window, neither script will start.
 
 Run the four commands under "The exact commands to run first" at the end of this file.
 Then read "What the eval suite measured" and "Risks worth a decision", which are the

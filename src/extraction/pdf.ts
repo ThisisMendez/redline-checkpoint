@@ -189,9 +189,15 @@ async function whyNothingToRead(
  * every path out of it rather than on some of them. Never thrown past this file.
  */
 class Refused extends Error {
-  constructor(readonly reason: ExtractionRejectionReason) {
+  // Declared as a field rather than a constructor parameter property, because a
+  // parameter property emits runtime code and Node's type-stripping refuses it.
+  // `npm run smoke` and `npm run eval` run this file through plain Node.
+  readonly reason: ExtractionRejectionReason;
+
+  constructor(reason: ExtractionRejectionReason) {
     super(reason);
     this.name = "Refused";
+    this.reason = reason;
   }
 }
 
