@@ -18,13 +18,24 @@
 
 /* ── rail ──────────────────────────────────────────────────── */
 .rail{
-  display:flex;flex-direction:column;gap:2rem;
+  display:flex;flex-direction:column;
   min-height:100vh;
   padding:var(--pad) 1.75rem var(--pad);
   background:var(--grey);
   border-right:1px solid var(--grey-line);
 }
-.rail__top{position:sticky;top:var(--pad);display:flex;flex-direction:column;gap:1.5rem}
+/* The sticky group is opaque, carries the rail's own field, and reaches the top of the
+   window, so the list below slides under it instead of showing through. The negative
+   top margin cancels the padding that lets it reach the top, so at rest the mark sits
+   exactly where it did. The 2rem below it was the rail's gap; it is padding here so the
+   band covers it, and it is not a negative bottom margin because a sticky box is
+   clamped by its margin box and would overrun the rail's bottom edge on phones. */
+.rail__top{
+  position:sticky;top:0;z-index:1;
+  display:flex;flex-direction:column;gap:1.5rem;
+  margin-top:calc(var(--pad) * -1);padding:var(--pad) 0 2rem;
+  background:var(--grey);
+}
 
 .mark{display:flex;align-items:center;gap:.625rem;text-decoration:none}
 .mark__box{
