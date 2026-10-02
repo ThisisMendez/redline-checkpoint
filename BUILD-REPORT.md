@@ -66,13 +66,15 @@ commits still carry one. `95153be`, the initial commit, carries `Co-Authored-By:
 and so keeps Claude in the repository's contributor list; `449ae75`, `3a1cbe9` and
 `4153e1d` carry only `Claude-Session`, which GitHub does not show as an author. Removing
 them means rewriting from the first commit, which changes every hash in the repository.
-Waiting on the owner, and best decided after Session 5 so students are not hit twice.
+Waiting on the owner, and best decided after Session 4 on 2026-10-02, so students are not
+hit twice.
 
-The rewrite already moved every hash from the build onward. The Session 4 student handbook
-tells students to clone at `590d4ce`, which is now `327481d` with identical content. A clone
-made then meets a diverged history on `git pull`, and that clone also has the smoke and eval
-bug, fixed in `68a7869`. The full old-to-new map and what to tell students are in the brain
-task `tasks/20261002-redline-checkpoint-rewritten-before-session-5`.
+The rewrite already moved every hash from the build onward. A copy of the repository made
+before the build first reached GitHub, at 13:37 on 2026-09-12, updates cleanly with
+`git pull`. A copy made after that meets a diverged history; download a fresh copy instead.
+The latest version also carries the smoke and eval fix, `68a7869`, and the landing rail fix.
+The full old-to-new map is in the brain task
+`tasks/20261002-redline-checkpoint-rewritten-before-session-5`.
 
 **2. A local backup branch exists.** `backup/main-before-trailer-rewrite` points at the
 history as it was before the rewrite. It was never pushed. Delete it with
