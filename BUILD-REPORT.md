@@ -32,6 +32,9 @@ The product does work end to end against a real model. `npm run smoke` puts the 
 contract through all four seams and prints every flag with its source sentence.
 `npm run eval` measures a labelled corpus and produced the numbers in the next section.
 
+If you are picking this up in a new session, read "Open threads from 2026-10-01" first.
+It lists the decisions that were asked and not yet answered when the last session ended.
+
 ## Ticket status
 
 | Ticket | Title | Status |
@@ -50,6 +53,56 @@ contract through all four seams and prints every flag with its source sentence.
 | 12 | Red lines promote and mark | done as written, persistence unverified |
 | 13 | Tier-two eval suite | done, and it produced real numbers |
 | 14 | Landing page | done |
+
+## Open threads from 2026-10-01
+
+Asked of the owner, or found, in the session that ended on 2026-10-01, and not yet
+settled. Nothing here is broken; each is a decision.
+
+**1. One commit still shows Claude as an author.** The 34 commits of the v1 build were
+rewritten on 2026-10-01 to remove `Co-Authored-By` and `Claude-Session` trailers, which
+the owner does not want on their commits, and `main` was force-pushed. Four earlier
+commits still carry one. `95153be`, the initial commit, carries `Co-Authored-By: Claude`
+and so keeps Claude in the repository's contributor list; `449ae75`, `3a1cbe9` and
+`4153e1d` carry only `Claude-Session`, which GitHub does not show as an author. Removing
+them means rewriting from the first commit, which changes every hash in the repository.
+Waiting on the owner, and best decided after Session 5 so students are not hit twice.
+
+The rewrite already moved every hash from the build onward. The Session 4 student handbook
+tells students to clone at `590d4ce`, which is now `327481d` with identical content. A clone
+made then meets a diverged history on `git pull`, and that clone also has the smoke and eval
+bug, fixed in `68a7869`. The full old-to-new map and what to tell students are in the brain
+task `tasks/20261002-redline-checkpoint-rewritten-before-session-5`.
+
+**2. A local backup branch exists.** `backup/main-before-trailer-rewrite` points at the
+history as it was before the rewrite. It was never pushed. Delete it with
+`git branch -D backup/main-before-trailer-rewrite` once the rewritten history has been
+checked.
+
+**3. `DESIGN.md` does not yet say a pinned element must be opaque.** The landing page's
+rail had a sticky top group with no background, so the clause list showed through it on
+scroll. Fixed in `app/landing.css`. `DESIGN.md` still describes the sticky group without
+saying it needs the rail's own field, so the next pinned element could repeat the bug.
+`landing/styles.css`, the original static file `DESIGN.md` is recorded from, still has
+the bug; it was left alone because this report treats those files as the untouched
+record. One sentence in `DESIGN.md` would close it. Waiting on the owner.
+
+**4. The landing page and the app share rail class names.** `app/landing.css` and
+`components/rail.css` both style `.rail` and `.rail__top`. Harmless today, because every
+link between the landing page and the app is a plain `<a href>`, so the two stylesheets
+never load into the same document. If anyone switches those links to Next's `<Link>`,
+the landing rail's sticky and spacing rules can leak into the app shell. Rename one set
+before making that change.
+
+**5. The summary told the reader about a clause its flag could not cite.** In the
+2026-10-01 smoke run the liability-cap flag was dropped again because the model retyped
+its characters, and the plain-English summary still said Meridian's liability is capped
+at a year of fees. So the one clause the checked path could not show was described by
+the unchecked path. Better than silence for the reader; at odds with the rule that the
+reader can check everything they are told. Belongs with the character-fidelity work in
+`LEARNINGS.md`.
+
+The longer-standing decisions under "Risks worth a decision" are all still open.
 
 ## Decisions made in the owner's absence
 
